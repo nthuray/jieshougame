@@ -687,17 +687,39 @@
 <style id="ts-css">
 :root{--ts:1;--cts:calc(1 + (var(--ts) - 1)*.35)}
 html[data-ts="s"]{--ts:.88}html[data-ts="m"]{--ts:1}html[data-ts="l"]{--ts:1.25}
-#ts-ctl{position:absolute;left:14px;top:12px;z-index:900;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.62);border:3px solid #fff;border-radius:12px;padding:4px 8px;font-family:inherit;color:#fff;font-size:20px;font-weight:bold}
-#ts-ctl button{font-family:inherit;font-weight:bold;color:#fff;background:#555;border:2px solid #fff;border-radius:8px;min-width:44px;height:38px;cursor:pointer;padding:0 6px}
+#ts-ctl{position:absolute;left:10px;top:8px;z-index:900;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.6);border:2px solid #fff;border-radius:9px;padding:2px 6px;font-family:inherit;color:#fff;font-size:14px;font-weight:bold}
+#ts-ctl button{font-family:inherit;font-weight:bold;color:#fff;background:#555;border:2px solid #fff;border-radius:6px;min-width:32px;height:28px;cursor:pointer;padding:0 4px}
 #ts-ctl button[aria-pressed="true"]{background:#f39c12;color:#111}
-#ts-ctl button:nth-of-type(1){font-size:16px}#ts-ctl button:nth-of-type(2){font-size:20px}#ts-ctl button:nth-of-type(3){font-size:26px}
+#ts-ctl button:nth-of-type(1){font-size:12px}#ts-ctl button:nth-of-type(2){font-size:15px}#ts-ctl button:nth-of-type(3){font-size:19px}
 </style>
 <style id="dev-css">
 .modal-card{max-height:96%;overflow-y:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box}
-.phone #ts-ctl{padding:6px 10px;gap:8px}
-.phone #ts-ctl button{min-width:56px;height:50px}
+.phone #ts-ctl{padding:3px 7px;gap:5px}
+.phone #ts-ctl button{min-width:40px;height:36px}
 .phone .modal-btn{min-height:54px;min-width:120px}
 .phone .map-footer-guide{font-size:calc(16px*var(--ts,1))!important;white-space:nowrap}
+</style>
+<style id="edu-css">
+.edu-fab{position:absolute;right:16px;bottom:14px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:4px;cursor:pointer}
+.edu-fab img{width:86px;height:auto;display:block;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5));animation:efbob 1.1s ease-in-out infinite alternate}
+.edu-fab .ef-tip{background:#fff;color:#222;border:3px solid #222;border-radius:12px;padding:3px 10px;font-weight:bold;font-size:calc(17px*var(--ts,1));white-space:nowrap}
+@keyframes efbob{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-8px,0)}}
+.edu-help{position:absolute;right:16px;bottom:150px;z-index:61;width:336px;max-height:56%;display:flex;flex-direction:column;background:#eef6f7;color:#223;border:4px solid #1d6f8a;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.5);text-align:left}
+.edu-help .eh-head{display:flex;align-items:center;gap:8px;background:#1d6f8a;color:#fff;padding:6px 10px;font-size:calc(18px*var(--ts,1))}
+.edu-help .eh-head img{width:34px;height:34px;object-fit:contain;background:#fff;border-radius:50%}
+.edu-help .eh-x{margin-left:auto;cursor:pointer;font-size:calc(20px*var(--ts,1));padding:0 6px}
+.edu-help .eh-msgs{padding:8px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px}
+.edu-help .m{padding:6px 10px;border-radius:12px;font-size:calc(16px*var(--ts,1));line-height:1.45;max-width:90%}
+.edu-help .m.bot{background:#fff;border:2px solid #b7d4da;align-self:flex-start}
+.edu-help .m.me{background:#ffd966;align-self:flex-end}
+.edu-help .eh-pills{display:flex;gap:6px;padding:6px 8px;background:#dcebee}
+.edu-help .eh-pills button{flex:1;font-family:inherit;font-size:calc(16px*var(--ts,1));font-weight:bold;border:2px solid #1d6f8a;background:#fff;color:#1d6f8a;border-radius:10px;padding:6px 4px;cursor:pointer;min-height:44px}
+.g-mc.hint{box-shadow:0 0 0 4px #ffd400,0 0 18px 6px #ff9f00;animation:hglow .5s ease-in-out infinite alternate}
+.g-bf.hint{border-radius:50%;box-shadow:0 0 0 4px #ffd400,0 0 20px 8px #ff9f00;animation:hglow .5s ease-in-out infinite alternate}
+@keyframes hglow{from{opacity:.6}to{opacity:1}}
+.phone .edu-fab img{width:100px}.phone .edu-help{bottom:160px}
+#task-modal.help-open{justify-content:flex-start!important;padding-left:14px;box-sizing:border-box}
+#task-modal.help-open .modal-card{max-width:640px;width:calc(100% - 370px)}
 </style>
 </head>
 <body>
@@ -980,8 +1002,28 @@ const shuffle=a=>[...a].sort(()=>Math.random()-.5);
 let gTimer=null;
 const A=()=>$('game-area');
 const _close=closeModal;
-closeModal=function(){clearInterval(gTimer);_close();};
-function win(msg){A().innerHTML='<div class="g-msg">🎉 '+msg+'</div><button class="g-btn ok" onclick="solveCurrentNode()">⭐ 領取徽章</button>';}
+closeModal=function(){clearInterval(gTimer);rmFab();_close();};
+function win(msg){rmFab();A().innerHTML='<div class="g-msg">🎉 '+msg+'</div><button class="g-btn ok" onclick="solveCurrentNode()">⭐ 領取徽章</button>';}
+function rmFab(){window.EDU_HINT=null;document.querySelectorAll('#task-modal .edu-fab,#task-modal .edu-help').forEach(e=>e.remove());$('task-modal').classList.remove('help-open');}
+function addFab(){
+  rmFab();const ov=$('task-modal');
+  const f=document.createElement('div');f.className='edu-fab';
+  f.innerHTML='<span class="ef-tip">卡關了嗎？點我！</span><img src="'+IMG.edu+'" alt="e度">';
+  f.onclick=()=>openHelp();ov.appendChild(f);
+}
+function openHelp(){
+  const ov=$('task-modal'),old=ov.querySelector('.edu-help');if(old){old.remove();ov.classList.remove('help-open');return;}ov.classList.add('help-open');
+  const d=document.createElement('div');d.className='edu-help';
+  d.innerHTML='<div class="eh-head"><img src="'+IMG.edu+'" alt=""><b>e度 小幫手</b><span class="eh-x">✕</span></div><div class="eh-msgs"></div><div class="eh-pills"><button data-k="hint">💡 給我提示</button><button data-k="how">❓ 這關怎麼玩</button></div>';
+  ov.appendChild(d);
+  const msgs=d.querySelector('.eh-msgs');
+  const add=(cls,t)=>{const m=document.createElement('div');m.className='m '+cls;m.textContent=t;msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;};
+  add('bot','嗨～我是 e度！卡住了嗎？按「給我提示」，我會一步一步幫你，越按提示越清楚喔！');
+  d.querySelector('.eh-x').onclick=()=>{d.remove();ov.classList.remove('help-open');};
+  d.querySelector('.eh-pills').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.k==='hint'){add('me','給我提示');add('bot',window.EDU_HINT?window.EDU_HINT():'先仔細看看題目喔！');}
+    else{add('me','這關怎麼玩？');add('bot',$('modal-desc').innerText);}};
+}
 function strip(items){return '<div class="g-strip">'+items.map(x=>'<figure><img src="'+x[0]+'"><figcaption>'+x[1]+'</figcaption></figure>').join('')+'</div>';}
 const LV={
 1:{title:'① 老街特產大挑戰',intro:'三峽老街保留了連續的紅磚拱廊與華麗的巴洛克式立面，街上還有酥脆的金牛角和清香的碧螺春綠茶。四位遊客帶著疑問來到老街，請你聽他們的描述，幫他們找到對應的圖案！',pre:()=>strip([[IMG.cards.jin,'金牛角'],[IMG.cards.tea,'碧螺春'],[IMG.cards.baroque,'巴洛克建築'],[IMG.cards.arcade,'紅磚拱廊']]),start:g1},
@@ -992,7 +1034,7 @@ const LV={
 };
 function openNode(id){
   if(completedNodes.has(id))return;
-  currentNodeId=id;clearInterval(gTimer);
+  currentNodeId=id;clearInterval(gTimer);rmFab();
   document.querySelector('.modal-card').classList.remove('tablet','inb');
   if(id===5)document.querySelector('.modal-card').classList.add('inb');
   $('modal-title').innerText=LV[id].title;
@@ -1003,14 +1045,16 @@ function openNode(id){
   if(id===5)fitInb();
 }
 // ---------- 1 老街配對
-function g1(){
+function g1(){addFab();
   const info={jin:'金牛角：三峽老街的人氣點心，外型像牛角，外皮酥脆、奶香濃郁。',tea:'碧螺春：三峽盛產的綠茶，茶葉捲曲像小螺，沖泡後清香回甘。',baroque:'巴洛克建築：立面有華麗的雕花、山牆與柱飾，是老街最吸睛的特色。',arcade:'紅磚拱廊：連續的紅磚拱廊（亭仔腳）能讓行人遮陽避雨。'};
   const names={jin:'金牛角',tea:'碧螺春',baroque:'巴洛克建築',arcade:'紅磚拱廊'};
   const T=shuffle([{a:0,k:'jin',say:'我想找一種外型像牛角、外皮酥脆的麵包，聽說是老街的人氣伴手禮！'},{a:1,k:'tea',say:'我想喝一杯清香回甘的綠茶，聽說三峽有一種茶葉捲得像小螺。'},{a:2,k:'baroque',say:'哇！這棟建築的牌樓立面有好華麗的雕花和山牆，這是什麼風格呢？'},{a:3,k:'arcade',say:'地圖上說老街有一整排連續的拱廊，下雨天走在下面也不怕淋濕，是哪一個呢？'}]);
-  let i=0;
+  let i=0,hc=0;
+  const H1={jin:['注意關鍵字「牛角」和「酥脆」，它是一種點心。','這是一種麵包類的點心，找找看金黃色、彎彎形狀的圖案。'],tea:['關鍵字是「綠茶」和「茶葉捲得像小螺」。','它是一種飲品，圖案裡有一杯綠綠的茶。'],baroque:['關鍵字是「牌樓立面」「雕花」「山牆」，它是一種建築風格。','這棟建築有華麗的雕花，不是單純的拱門喔。'],arcade:['關鍵字是「一整排連續的拱廊」和「下雨天不怕淋濕」。','它是紅磚砌成、一個接著一個的圓拱。']};
+  window.EDU_HINT=()=>{const t=T[i];if(!t)return '四位遊客都找到囉！';hc++;return hc===1?H1[t.k][0]:hc===2?H1[t.k][1]:'答案是「'+names[t.k]+'」，點它就對了！';};
   const show=(prev)=>{
     if(i>=T.length)return win((prev?prev+' ':'')+'四位遊客都找到想要的老街寶物了！');
-    const t=T[i];
+    const t=T[i];hc=0;
     A().innerHTML='<div class="g-tour"><img src="'+IMG.av[t.a]+'"><div class="g-say">'+t.say+'</div></div><div class="g-cards" id="g-cs"></div><div class="g-msg" id="g-m">'+(prev?'✅ '+prev:'')+'</div><div id="g-nx"></div>';
     shuffle(Object.keys(names)).forEach(k=>{
       const b=document.createElement('button');b.className='g-card2';b.innerHTML='<img src="'+IMG.cards[k]+'"><span>'+names[k]+'</span>';
@@ -1033,10 +1077,11 @@ const TP=[
 {k:'lion',img:IMG.tp.lion,n:'石雕員光（獅面人物交趾陶）',d:'員光是樑下的裝飾構件，這件作品雕有獅面與人物，神情生動。'},
 {k:'dragon',img:IMG.tp.dragon,n:'石雕堵牆（降龍）',d:'牆面刻畫降龍的故事，龍身盤繞，人物英勇。'}];
 function nameHtml(n){const i=n.indexOf('（');return i<0?'<b>'+n+'</b>':'<b>'+n.slice(0,i)+'</b><small>'+n.slice(i)+'</small>';}
-function g2(){
+function g2(){addFab();
   const cards=[];TP.forEach(p=>{cards.push({p,t:'pic'},{p,t:'name'});});
   A().innerHTML='<div class="g-msg" id="g-m">翻開兩張卡片，找出「圖片」和「名稱」配成一對！</div><div class="g-grid5" id="g-g"></div>';
-  let first=null,lock=false,pairs=0;
+  let first=null,lock=false,pairs=0,hc=0;const dn=new Set(),els=[];
+  window.EDU_HINT=()=>{hc++;const p=TP.find(x=>!dn.has(x));if(!p)return '全部配對完成囉！';if(hc===1)return '先翻開一張卡片，記住它的位置！圖片卡和名稱卡要成對，記憶力大考驗喔。';if(hc===2)return '還沒配到的作品之一：「'+p.n+'」。'+p.d;els.forEach(x=>{if(x.c.p===p){x.b.classList.add('hint');setTimeout(()=>x.b.classList.remove('hint'),2500);}});return '我把「'+p.n+'」的圖片和名稱卡閃一下，快翻翻看！';};
   shuffle(cards).forEach(c=>{
     const b=document.createElement('button');b.className='g-mc';b.textContent='❓';
     const face=c.t==='pic'?'<img src="'+c.p.img+'">':nameHtml(c.p.n);
@@ -1045,11 +1090,11 @@ function g2(){
       b.innerHTML=face;b.classList.add('open');
       if(!first){first=b;b._c=c;return;}
       if(first._c.p===c.p){
-        first.className=b.className='g-mc done';first=null;$('g-m').textContent='✅ '+c.p.n+'：'+c.p.d;
+        first.className=b.className='g-mc done';dn.add(c.p);first=null;$('g-m').textContent='✅ '+c.p.n+'：'+c.p.d;
         if(++pairs===TP.length)setTimeout(()=>win('祖師廟的五件藝術作品你都配對成功了！'),1200);
       }else{lock=true;const f=first;first=null;setTimeout(()=>{f.textContent=b.textContent='❓';f.classList.remove('open');b.classList.remove('open');lock=false;},900);}
     };
-    $('g-g').appendChild(b);
+    els.push({b,c});$('g-g').appendChild(b);
   });
 }
 // ---------- 4 找蝴蝶(介壽彩蝶園)
@@ -1059,8 +1104,9 @@ hongwen:{n:'紅紋鳳蝶',d:'黑色後翅中央有顯眼白斑，邊緣與腹部
 danse:{n:'淡色小紋青斑蝶',d:'黑褐色翅膀上點綴著密密麻麻的淡青色條紋與斑點，呈現出如夢幻般的水青色斑駁花紋。'},
 duanhong:{n:'端紅蝶',d:'臺灣體型最大的粉蝶，翅膀主要為白色與淡黃色，最標誌性的特徵是前翅端角有如火焰般奪目的橙紅色斑塊。'},
 wuwei:{n:'無尾鳳蝶',d:'翅膀上布滿不規則的米黃色斑點，後翅肛角有紅斑，與一般鳳蝶不同，牠們的後翅邊緣圓滑、完全沒有尾突。'}};
-function g3(){
-  const keys=Object.keys(BF);let n=0;
+function g3(){addFab();
+  const keys=Object.keys(BF);let n=0,hc=0;const fd=new Set();
+  window.EDU_HINT=()=>{hc++;const k=keys.find(x=>!fd.has(x));if(!k)return '五隻蝴蝶都找到囉！';const r=BFRECT[k],cx=r[0]+r[2]/2,cy=r[1]+r[3]/2,pos=(cy<35?'上':cy>65?'下':'')+(cx<35?'左':cx>65?'右':'中')+'方';if(hc===1)return '蝴蝶的顏色常和花很像，注意花叢邊緣、葉子後面和花盆旁邊。';if(hc===2)return '還有一隻「'+BF[k].n+'」躲著。牠的特徵：'+BF[k].d.slice(0,30)+'…大概在畫面的'+pos+'附近找找看。';const b=document.querySelector('.g-bf:not(.found)');keys.forEach((kk,ix)=>{});const btn=[...document.querySelectorAll('.g-bf')][keys.indexOf(k)];if(btn){btn.classList.add('hint');setTimeout(()=>btn.classList.remove('hint'),2800);}return '我把「'+BF[k].n+'」躲的位置閃一下，快找找看！';};
   A().innerHTML='<div class="g-msg" id="g-m">已找到 0 / 5 隻校蝶。蝴蝶躲在彩蝶園的花叢裡，仔細找找看有沒有什麼線索喔！</div><div class="g-sc" id="g-sc"><img class="g-gimg" src="'+IMG.garden+'"></div>';
   const sc=$('g-sc');
   sc.onclick=e=>{if(e.target===sc||e.target.classList.contains('g-gimg'))$('g-m').textContent='再找找看，蝴蝶躲得很隱密喔！（已找到 '+n+' / 5）';};
@@ -1070,7 +1116,7 @@ function g3(){
     b.innerHTML='<img class="bfull" src="'+IMG.bfFull[k]+'" alt="">';
     b.onclick=e=>{
       e.stopPropagation();if(b.classList.contains('found'))return;
-      b.classList.add('found');n++;$('g-m').textContent='已找到 '+n+' / 5 隻校蝶！';
+      b.classList.add('found');n++;fd.add(k);$('g-m').textContent='已找到 '+n+' / 5 隻校蝶！';
       const pop=document.createElement('div');pop.className='g-pop';
       pop.innerHTML='<div class="pc"><img src="'+IMG.bf[k]+'"><h4>'+BF[k].n+'</h4><p>'+BF[k].d+'</p><button class="g-btn ok">'+(n<5?'知道了，繼續找！':'太棒了！')+'</button></div>';
       pop.querySelector('button').onclick=()=>{pop.remove();if(n===5)win('五種校蝶全部找到了，你是校蝶小專家！');};
@@ -1080,9 +1126,10 @@ function g3(){
   });
 }
 // ---------- 3 藍染
-function g4(){
+function g4(){addFab();
   const S=[['採收馬藍','染料來自馬藍的葉子，先到田裡把馬藍採收下來。'],['捆紮布疋','把布捲起來，用繩子捆紮或縫紮，染完拆開就會出現白色的花紋。'],['浸泡發酵','馬藍葉泡水、發酵，慢慢變成藍色的染料。'],['入缸染色','把捆好的布放進染缸浸染，剛拿出來時是黃綠色的喔！'],['晾乾氧化','布掛起來晾乾，接觸空氣氧化後，就會變成漂亮的藍色。']];
-  let n=0;
+  let n=0,hc=0;
+  window.EDU_HINT=()=>{if(n>=S.length)return '流程都完成囉！';hc++;return hc===1?'想想看：要先有染料，才能染布；染完還要讓布變成藍色。':hc===2?'下一步的線索：'+S[n][1]:'下一步是「'+S[n][0]+'」，點它吧！';};
   A().innerHTML='<div class="g-slots">'+S.map((s,i)=>'<div class="slot" id="sl'+i+'"><span>'+(i+1)+'</span></div>').join('')+'</div><div class="g-msg" id="g-m">依照藍染的順序，點選下一個步驟，把流程圖拼起來！</div><div id="g-o" class="g-opts5"></div>';
   const draw=()=>{
     $('g-o').innerHTML='';
@@ -1092,7 +1139,7 @@ function g4(){
       b.onclick=()=>{
         if(idx===n){
           $('sl'+n).innerHTML='<img src="'+IMG.dye[n+1]+'">';$('sl'+n).classList.add('filled');
-          n++;$('g-m').textContent='✅ '+s[1];
+          n++;hc=0;$('g-m').textContent='✅ '+s[1];
           if(n===S.length)return win('你完成了藍染的整個流程！');
           draw();
         }else{b.classList.add('bad');setTimeout(()=>b.classList.remove('bad'),400);$('g-m').textContent='順序不對喔，想想看下一步該做什麼？';}
@@ -1109,11 +1156,13 @@ function g5(){
    {q:'藍染布從染缸拿出來，為什麼會慢慢變藍？',o:['被太陽曬黑','接觸空氣氧化','被風吹乾'],a:1,e:'布接觸空氣氧化後，黃綠色會慢慢變成藍色。'},
    {q:'臺灣最大的斑蝶是哪一種？',o:['大白斑蝶','無尾鳳蝶','端紅蝶'],a:0,e:'大白斑蝶翅膀半透明白色，飛行緩慢，又稱「大笨蝶」。'}];
   document.querySelector('.modal-card').classList.remove('inb');document.querySelector('.modal-card').classList.add('tablet');
-  let i=0;
+  let i=0,hc5=0;
+  const QH=['想想剛才在老街關卡遇到的遊客，他想找什麼？','三峽盛產的茶，名字有個「螺」字，茶湯是什麼顏色？','祖師廟被稱為「藝術的殿堂」，督造的人是一位畫家兼教授。','藍染布剛拿出來是黃綠色，接觸什麼東西才慢慢變藍？','牠的別名叫「大笨蝶」，因為飛得很慢。'];
+  window.EDU_HINT=()=>{const q=Q[i];if(!q)return '全部完成囉！';hc5++;if(hc5===1)return QH[i];if(hc5===2){const w=q.o.findIndex((x,k)=>k!==q.a);return '我可以告訴你，「'+q.o[w]+'」不是答案。';}return '答案是「'+q.o[q.a]+'」！';};
   A().innerHTML='<div class="tab" id="tabwrap"><div class="tab-cam"></div><div class="tab-screen" id="tabscreen"><div class="tab-head"><span class="tlg"><img src="'+IMG.yc+'" alt=""> 因材網 ‧ E度學習</span><span id="tp">1 / 5</span></div><div class="tab-body" id="tb"></div><img class="tedu" src="'+IMG.edu+'" alt="" onclick="openEdu(\'tabwrap\')"></div></div>';
   const show=()=>{
     if(i>=Q.length)return win('平板任務全部完成，你是智慧學習小達人！');
-    const q=Q[i];$('tp').textContent=(i+1)+' / '+Q.length;
+    const q=Q[i];hc5=0;$('tp').textContent=(i+1)+' / '+Q.length;
     $('tb').innerHTML='<div class="tq">'+q.q+'</div><div id="to"></div><div class="tf" id="tf"></div>';
     q.o.forEach((t,k)=>{
       const b=document.createElement('button');b.className='tbtn';b.textContent=['Ａ','Ｂ','Ｃ'][k]+'　'+t;
@@ -1194,7 +1243,7 @@ window.addEventListener('resize',fitInb);
 function openEdu(hostId){
   const host=$(hostId);if(!host||host.querySelector('.edu-chat'))return;
   const d=document.createElement('div');d.className='edu-chat';
-  d.innerHTML='<div class="ec-head"><b>通用型學習夥伴</b><span class="pill" data-k="video">教學影片</span><span class="pill" data-k="help">操作說明</span><span class="ec-x">✕</span></div>'+
+  d.innerHTML='<div class="ec-head"><b>通用型學習夥伴</b><span class="pill" data-k="video">教學影片</span><span class="pill" data-k="help">操作說明</span><span class="pill" data-k="hint">答題提示</span><span class="ec-x">✕</span></div>'+
   '<div class="ec-msgs"><div class="m bot"><img src="'+IMG.edu+'" alt=""><div class="b">嗨～我是您的AI教學夥伴e度。<br>你可以問我任何學科概念，或直接把你卡住的題目丟給我，例如「這題數學怎麼解？」、「光合作用是什麼？」。<br>我會一步步引導你思考，不直接給答案。準備好了就開始吧！</div></div></div>'+
   '<div class="ec-mode"><select><option>一般模式</option></select><small>切換模式會重新對話喔!</small></div>'+
   '<div class="ec-in"><input type="text" placeholder="試著輸入一個問題…"><button>➤</button></div>'+
@@ -1203,7 +1252,7 @@ function openEdu(hostId){
   const msgs=d.querySelector('.ec-msgs');
   const add=(cls,t)=>{const m=document.createElement('div');m.className='m '+cls;m.innerHTML=(cls==='bot'?'<img src="'+IMG.edu+'" alt="">':'')+'<div class="b"></div>';m.querySelector('.b').textContent=t;msgs.appendChild(m);msgs.scrollTop=msgs.scrollHeight;};
   d.querySelector('.ec-x').onclick=()=>d.remove();
-  d.querySelectorAll('.pill').forEach(p=>p.onclick=()=>add('bot',p.dataset.k==='video'?'這裡會有因材網的教學影片，教你一步步學會使用各項功能。':'這裡會說明每個按鈕的用途，不懂的時候可以回來看看。'));
+  d.querySelectorAll('.pill').forEach(p=>p.onclick=()=>add('bot',p.dataset.k==='hint'?(window.EDU_HINT?window.EDU_HINT():'先按「開始挑戰」進入題目，我再給你提示喔！'):p.dataset.k==='video'?'這裡會有因材網的教學影片，教你一步步學會使用各項功能。':'這裡會說明每個按鈕的用途，不懂的時候可以回來看看。'));
   const inp=d.querySelector('input'),send=()=>{const v=inp.value.trim();if(!v)return;add('me',v);inp.value='';setTimeout(()=>add('bot','這是示範畫面喔！之後登入真正的因材網，我就能一步步引導你思考囉～'),500);};
   d.querySelector('.ec-in button').onclick=send;inp.onkeydown=e=>{if(e.key==='Enter')send();};
 }
